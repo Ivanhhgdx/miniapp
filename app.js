@@ -648,18 +648,25 @@ function updateLiveProgress() {
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const todayName = dayOrder[now.getDay() - 1];
+  let dayFinished = false;
+  if (todayName && state.data?.schedule) {
+    const lastEnd = state.data.schedule
+      .filter((entry) => entry.week === state.week && entry.day === todayName)
+      .reduce((max, entry) => Math.max(max, parseEndMinutes(entry.time)), 0);
+    dayFinished = lastEnd > 0 && nowMinutes > lastEnd;
+  }
   document.querySelectorAll(".class-card[data-progress-start]").forEach((card) => {
     const start = Number(card.dataset.progressStart);
     const end = Number(card.dataset.progressEnd);
     const cardDay = card.dataset.progressDay;
     const cardWeek = Number(card.dataset.progressWeek);
     const isToday = cardDay === todayName && cardWeek === state.week;
-    const percent = isToday ? getProgressPercent(start, end, nowMinutes) : 0;
+    const percent = isToday && !dayFinished ? getProgressPercent(start, end, nowMinutes) : 0;
     const fill = card.querySelector(".class-progress-fill");
     if (fill) {
       fill.style.width = `${percent}%`;
     }
-    card.classList.toggle("is-live", isToday && nowMinutes >= start && nowMinutes <= end);
+    card.classList.toggle("is-live", isToday && !dayFinished && nowMinutes >= start && nowMinutes <= end);
   });
 }
 
