@@ -213,6 +213,8 @@ function createClassCard(entry, displayLines, title) {
   const endMinutes = parseEndMinutes(entry.time);
   card.dataset.progressStart = String(startMinutes);
   card.dataset.progressEnd = String(endMinutes);
+  card.dataset.progressDay = entry.day;
+  card.dataset.progressWeek = String(entry.week);
   card.appendChild(progress);
   card.classList.add("has-progress");
   return card;
@@ -565,15 +567,19 @@ function renderWeek() {
 function updateLiveProgress() {
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayName = dayOrder[now.getDay() - 1];
   document.querySelectorAll(".class-card[data-progress-start]").forEach((card) => {
     const start = Number(card.dataset.progressStart);
     const end = Number(card.dataset.progressEnd);
-    const percent = getProgressPercent(start, end, nowMinutes);
+    const cardDay = card.dataset.progressDay;
+    const cardWeek = Number(card.dataset.progressWeek);
+    const isToday = cardDay === todayName && cardWeek === state.week;
+    const percent = isToday ? getProgressPercent(start, end, nowMinutes) : 0;
     const fill = card.querySelector(".class-progress-fill");
     if (fill) {
       fill.style.width = `${percent}%`;
     }
-    card.classList.toggle("is-live", nowMinutes >= start && nowMinutes <= end);
+    card.classList.toggle("is-live", isToday && nowMinutes >= start && nowMinutes <= end);
   });
 }
 
