@@ -521,6 +521,11 @@ body.is-ready .app-header {
   display: block;
 }
 
+.teacher-dept {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 body.is-overlay-open {
   overflow: hidden;
 }
@@ -591,6 +596,26 @@ body.is-overlay-open {
   gap: 8px;
   color: var(--muted);
   font-size: 14px;
+}
+
+.teacher-modal-block {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.teacher-modal-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.teacher-modal-value {
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .modal-section-title {

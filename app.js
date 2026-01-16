@@ -86,57 +86,68 @@ const teachersData = [
   {
     name: "Кубрикова Анна Сергеевна",
     subjects: ["Основы российской государственности"],
-    department: "",
+    department: "Правоведения",
+    position: "старший преподаватель",
   },
   {
     name: "Сизых Ирина Сергеевна",
     subjects: ["История России"],
-    department: "",
+    department: "Истории и гуманитарных наук",
+    position: "старший преподаватель",
   },
   {
     name: "Медников Дмитрий Михайлович",
     subjects: ["Иностранный язык"],
-    department: "",
+    department: "Делового иностранного языка",
+    position: "старший преподаватель",
   },
   {
     name: "Подпорина Наталья Михайловна",
     subjects: ["Иностранный язык"],
-    department: "",
+    department: "Делового иностранного языка",
+    position: "старший преподаватель",
   },
   {
     name: "Лозовой Александр Александрович",
     subjects: ["Физическая культура и спорт"],
-    department: "",
+    department: "Физического воспитания и спорта",
+    position: "старший преподаватель",
   },
   {
     name: "Жданов Олег Николаевич",
     subjects: ["Введение в высшую математику"],
-    department: "",
+    department: "Безопасности информационных технологий",
+    position: "доцент",
   },
   {
     name: "Семенкова Арина Алексеевна",
     subjects: ["Общий физический практикум"],
-    department: "",
+    department: "Технической физики (Радиофизика и электроника)",
+    position: "преподаватель",
   },
   {
     name: "Охоткина Евгения Александровна",
     subjects: ["Общий физический практикум", "Введение в технику физического эксперимента"],
-    department: "",
+    department: "Технической физики (Радиофизика и электроника)",
+    position: "преподаватель",
   },
   {
     name: "Золотова Ольга Павловна",
     subjects: ["Информационные технологии в науке и образовании"],
-    department: "",
+    department: "Технической физики (Электричество и магнетизм)",
+    position: "преподаватель",
   },
   {
     name: "Лукьянов Михаил Михайлович",
     subjects: ["Информационные технологии в науке и образовании"],
-    department: "",
+    department: "Информационные технологии в науке и образовании",
+    position: "преподаватель",
   },
   {
     name: "Телегин Сергей Владимирович",
     subjects: ["Механика"],
-    department: "",
+    department: "Технической физики (Молекулярная физика)",
+    position: "преподаватель",
   },
 ];
 
@@ -725,8 +736,12 @@ function renderTeachers() {
     const subjects = document.createElement("div");
     subjects.className = "teacher-subjects";
     subjects.textContent = teacher.subjects.join(", ");
+    const dept = document.createElement("div");
+    dept.className = "teacher-dept";
+    dept.textContent = teacher.department || "Кафедра не указана";
     card.appendChild(name);
     card.appendChild(subjects);
+    card.appendChild(dept);
     card.addEventListener("click", () => {
       openTeacherModal(teacher);
     });
@@ -761,9 +776,45 @@ function openTeacherModal(teacher) {
     clearTimeout(teacherModalHideTimer);
     teacherModalHideTimer = null;
   }
-  const department = teacher.department ? teacher.department : "Кафедра не указана";
   teacherModalTitle.textContent = teacher.name;
-  teacherModalBody.textContent = `${teacher.subjects.join(", ")}\n${department}`;
+  teacherModalBody.innerHTML = "";
+
+  const subjectsBlock = document.createElement("div");
+  subjectsBlock.className = "teacher-modal-block";
+  const subjectsLabel = document.createElement("div");
+  subjectsLabel.className = "teacher-modal-label";
+  subjectsLabel.textContent = "Дисциплины";
+  const subjectsValue = document.createElement("div");
+  subjectsValue.className = "teacher-modal-value";
+  subjectsValue.textContent = teacher.subjects.join(", ");
+  subjectsBlock.appendChild(subjectsLabel);
+  subjectsBlock.appendChild(subjectsValue);
+
+  const departmentBlock = document.createElement("div");
+  departmentBlock.className = "teacher-modal-block";
+  const departmentLabel = document.createElement("div");
+  departmentLabel.className = "teacher-modal-label";
+  departmentLabel.textContent = "Кафедра";
+  const departmentValue = document.createElement("div");
+  departmentValue.className = "teacher-modal-value";
+  departmentValue.textContent = teacher.department || "Кафедра не указана";
+  departmentBlock.appendChild(departmentLabel);
+  departmentBlock.appendChild(departmentValue);
+
+  const positionBlock = document.createElement("div");
+  positionBlock.className = "teacher-modal-block";
+  const positionLabel = document.createElement("div");
+  positionLabel.className = "teacher-modal-label";
+  positionLabel.textContent = "Должность";
+  const positionValue = document.createElement("div");
+  positionValue.className = "teacher-modal-value";
+  positionValue.textContent = teacher.position || "Должность не указана";
+  positionBlock.appendChild(positionLabel);
+  positionBlock.appendChild(positionValue);
+
+  teacherModalBody.appendChild(subjectsBlock);
+  teacherModalBody.appendChild(departmentBlock);
+  teacherModalBody.appendChild(positionBlock);
   teacherModal.classList.remove("is-hidden");
   teacherModal.classList.add("is-visible");
 }
