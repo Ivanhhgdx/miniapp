@@ -1,9 +1,131 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta http-equiv="refresh" content="0; url=miniapp/index.html" />
-</head>
-<body>
-  <p>Redirecting...</p>
-</body>
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Расписание БФК25-01</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Rubik:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  </head>
+  <body>
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-title">Расписание</div>
+        <div class="brand-sub" id="groupName">БФК25-01</div>
+      </div>
+      <div class="header-actions">
+        <button class="theme-cycle" id="themeCycle" type="button" aria-label="Сменить тему">
+          Тема: Свет
+        </button>
+      </div>
+    </header>
+
+    <main class="app">
+      <section class="panel search-panel">
+        <div class="panel-head">
+          <h2>Поиск</h2>
+          <div class="panel-hint">Предмет, преподаватель или аудитория • Премиум</div>
+        </div>
+        <div class="search-box">
+          <input
+            class="search-input"
+            id="searchInput"
+            type="search"
+            placeholder="Поиск"
+            autocomplete="off"
+          />
+          <button class="search-clear" id="searchClear" type="button" aria-label="Очистить">x</button>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </section>
+
+      <section class="hero">
+        <div class="hero-card">
+          <div class="hero-label">Сегодня</div>
+          <div class="hero-value" id="todayLabel">—</div>
+          <div class="hero-sub" id="todayDate">—</div>
+        </div>
+        <div class="hero-card accent">
+          <div class="hero-label" id="nextLabel">Следующая пара</div>
+          <div class="hero-value" id="nextClassTitle">—</div>
+          <div class="hero-sub" id="nextClassMeta">—</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Раздел</h2>
+          <div class="panel-hint" id="todayHint"></div>
+        </div>
+        <div class="week-toggle" role="tablist">
+          <button class="week-btn" data-week="1">1 неделя</button>
+          <button class="week-btn" data-week="2">2 неделя</button>
+          <button class="week-btn" data-week="session">Сессия</button>
+        </div>
+        <div class="subgroup-toggle" id="subgroupToggle" role="tablist">
+          <button class="subgroup-btn" data-subgroup="all">Все</button>
+          <button class="subgroup-btn" data-subgroup="1">1 подгруппа</button>
+          <button class="subgroup-btn" data-subgroup="2">2 подгруппа</button>
+        </div>
+      </section>
+
+      <section class="panel schedule-panel" id="schedulePanel">
+        <div class="panel-head">
+          <h2>День недели</h2>
+          <div class="view-toggle" role="tablist">
+            <button class="view-btn active" data-view="day">День</button>
+            <button class="view-btn" data-view="week">Неделя</button>
+          </div>
+        </div>
+        <div class="day-chips" id="dayChips"></div>
+      </section>
+
+      <section class="panel schedule-panel">
+        <div class="panel-head">
+          <h2>Пары</h2>
+          <div class="panel-hint" id="daySummary"></div>
+        </div>
+        <div class="classes" id="classes"></div>
+      </section>
+
+      <section class="panel week-panel is-hidden" id="weekPanel">
+        <div class="panel-head">
+          <h2>Неделя</h2>
+          <div class="panel-hint">Все пары за неделю • Премиум</div>
+        </div>
+        <div class="week-classes" id="weekClasses"></div>
+      </section>
+
+      <section class="panel session-panel" id="sessionPanel">
+        <div class="panel-head">
+          <h2>Сессия</h2>
+          <div class="panel-hint">Только оставшиеся экзамены</div>
+        </div>
+        <div class="session" id="session"></div>
+      </section>
+    </main>
+
+    <div class="modal is-hidden" id="examModal" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" id="examBackdrop"></div>
+      <div class="modal-card">
+        <div class="modal-head">
+          <div class="modal-title" id="examTitle">Экзамен</div>
+          <button class="modal-close" id="examClose" type="button">Закрыть</button>
+        </div>
+        <div class="modal-body" id="examBody"></div>
+      </div>
+    </div>
+
+    <script src="data/data.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>
