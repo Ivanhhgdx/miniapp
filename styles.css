@@ -228,6 +228,24 @@ body.is-ready .app-header {
   width: 100%;
 }
 
+.teacher-btn {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-weight: 700;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.teacher-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
 .app {
   position: relative;
   z-index: 1;
@@ -380,7 +398,7 @@ body.is-ready .app-header {
   width: min(520px, 92vw);
   background: var(--panel);
   border-radius: 22px;
-  border: 1px solid var(--stroke);
+  border: 0;
   box-shadow: var(--shadow);
   padding: 18px;
   display: grid;
@@ -427,6 +445,93 @@ body.is-ready .app-header {
   border-radius: 16px;
   background: var(--card);
   border: 0;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  background: var(--bg);
+  color: var(--ink);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.overlay.is-hidden {
+  display: none;
+}
+
+.overlay.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.overlay-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.overlay-title {
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.overlay-back {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 700;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.overlay-body {
+  padding: 18px 20px 28px;
+  display: grid;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.teacher-item {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.teacher-name {
+  font-weight: 700;
+}
+
+.teacher-subjects {
+  color: var(--muted);
+  font-size: 13px;
+  display: block;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.25s ease;
+}
+
+.teacher-item.is-open .teacher-subjects {
+  max-height: 120px;
+  opacity: 1;
+}
+
+body.is-overlay-open {
+  overflow: hidden;
 }
 
 .modal-section-title {
@@ -743,6 +848,14 @@ html[data-theme="nord"] .session-panel {
 
   .panel-hint {
     font-size: 10px;
+  }
+
+  .overlay-head {
+    padding: 14px 16px;
+  }
+
+  .overlay-body {
+    padding: 14px 16px 24px;
   }
 
   .search-panel .panel-hint {

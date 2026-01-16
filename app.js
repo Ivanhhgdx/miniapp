@@ -43,6 +43,10 @@ const examBackdrop = document.getElementById("examBackdrop");
 const examClose = document.getElementById("examClose");
 const examTitle = document.getElementById("examTitle");
 const examBody = document.getElementById("examBody");
+const openTeachers = document.getElementById("openTeachers");
+const teachersOverlay = document.getElementById("teachersOverlay");
+const teachersBack = document.getElementById("teachersBack");
+const teachersList = document.getElementById("teachersList");
 
 const THEME_KEY = "schedule_theme";
 const VIEW_KEY = "schedule_view";
@@ -70,6 +74,53 @@ const examMaterials = {
     tips: ["Повторить обозначения", "Подготовить шаблон отчета"],
   },
 };
+
+const teachersData = [
+  {
+    name: "Кубрикова Анна Сергеевна",
+    subjects: ["Основы российской государственности"],
+  },
+  {
+    name: "Сизых Ирина Сергеевна",
+    subjects: ["История России"],
+  },
+  {
+    name: "Медников Дмитрий Михайлович",
+    subjects: ["Иностранный язык"],
+  },
+  {
+    name: "Подпорина Наталья Михайловна",
+    subjects: ["Иностранный язык"],
+  },
+  {
+    name: "Лозовой Александр Александрович",
+    subjects: ["Физическая культура и спорт"],
+  },
+  {
+    name: "Жданов Олег Николаевич",
+    subjects: ["Введение в высшую математику"],
+  },
+  {
+    name: "Семенкова Арина Алексеевна",
+    subjects: ["Общий физический практикум"],
+  },
+  {
+    name: "Охоткина Евгения Александровна",
+    subjects: ["Общий физический практикум", "Введение в технику физического эксперимента"],
+  },
+  {
+    name: "Золотова Ольга Павловна",
+    subjects: ["Информационные технологии в науке и образовании"],
+  },
+  {
+    name: "Лукьянов Михаил Михайлович",
+    subjects: ["Информационные технологии в науке и образовании"],
+  },
+  {
+    name: "Телегин Сергей Владимирович",
+    subjects: ["Механика"],
+  },
+];
 
 function setWeek(week) {
   state.week = week;
@@ -644,6 +695,48 @@ function closeExamModal() {
   examModal.classList.add("is-hidden");
 }
 
+function renderTeachers() {
+  if (!teachersList) return;
+  teachersList.innerHTML = "";
+  teachersData.forEach((teacher) => {
+    const card = document.createElement("div");
+    card.className = "teacher-item";
+    const name = document.createElement("div");
+    name.className = "teacher-name";
+    name.textContent = teacher.name;
+    const subjects = document.createElement("div");
+    subjects.className = "teacher-subjects";
+    subjects.textContent = teacher.subjects.join(", ");
+    card.appendChild(name);
+    card.appendChild(subjects);
+    card.addEventListener("click", () => {
+      card.classList.toggle("is-open");
+    });
+    teachersList.appendChild(card);
+  });
+}
+
+function openTeachersOverlay() {
+  if (!teachersOverlay) return;
+  renderTeachers();
+  teachersOverlay.classList.remove("is-hidden");
+  requestAnimationFrame(() => {
+    teachersOverlay.classList.add("is-visible");
+  });
+  document.body.classList.add("is-overlay-open");
+}
+
+function closeTeachersOverlay() {
+  if (!teachersOverlay) return;
+  teachersOverlay.classList.remove("is-visible");
+  const onEnd = () => {
+    teachersOverlay.classList.add("is-hidden");
+    teachersOverlay.removeEventListener("transitionend", onEnd);
+  };
+  teachersOverlay.addEventListener("transitionend", onEnd);
+  document.body.classList.remove("is-overlay-open");
+}
+
 function setTodayDefaults() {
   todayHint.textContent = "";
   state.day = pickDefaultDay(state.week);
@@ -768,6 +861,11 @@ async function init() {
   if (examBackdrop) examBackdrop.addEventListener("click", closeExamModal);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeExamModal();
+  });
+  if (openTeachers) openTeachers.addEventListener("click", openTeachersOverlay);
+  if (teachersBack) teachersBack.addEventListener("click", closeTeachersOverlay);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeTeachersOverlay();
   });
 
   requestAnimationFrame(() => {

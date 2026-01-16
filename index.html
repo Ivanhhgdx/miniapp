@@ -76,6 +76,7 @@
           <button class="subgroup-btn" data-subgroup="1">1 подгруппа</button>
           <button class="subgroup-btn" data-subgroup="2">2 подгруппа</button>
         </div>
+        <button class="teacher-btn" id="openTeachers" type="button">Преподаватели</button>
       </section>
 
       <section class="panel schedule-panel" id="schedulePanel">
@@ -123,6 +124,14 @@
         </div>
         <div class="modal-body" id="examBody"></div>
       </div>
+    </div>
+
+    <div class="overlay is-hidden" id="teachersOverlay" aria-hidden="true">
+      <div class="overlay-head">
+        <button class="overlay-back" id="teachersBack" type="button">← Назад</button>
+        <div class="overlay-title">Преподаватели</div>
+      </div>
+      <div class="overlay-body" id="teachersList"></div>
     </div>
 
     <script src="data/data.js"></script>
