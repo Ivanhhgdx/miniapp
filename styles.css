@@ -519,19 +519,78 @@ body.is-ready .app-header {
   color: var(--muted);
   font-size: 13px;
   display: block;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease, opacity 0.25s ease;
-}
-
-.teacher-item.is-open .teacher-subjects {
-  max-height: 120px;
-  opacity: 1;
 }
 
 body.is-overlay-open {
   overflow: hidden;
+}
+
+.teacher-modal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 7;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.teacher-modal.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.teacher-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+}
+
+.teacher-modal-card {
+  position: relative;
+  width: min(520px, 90vw);
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  transform: translateY(10px);
+  transition: transform 0.2s ease;
+}
+
+.teacher-modal.is-visible .teacher-modal-card {
+  transform: translateY(0);
+}
+
+.teacher-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.teacher-modal-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.teacher-modal-close {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.teacher-modal-body {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .modal-section-title {

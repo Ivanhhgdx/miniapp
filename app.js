@@ -47,6 +47,13 @@ const openTeachers = document.getElementById("openTeachers");
 const teachersOverlay = document.getElementById("teachersOverlay");
 const teachersBack = document.getElementById("teachersBack");
 const teachersList = document.getElementById("teachersList");
+const teacherModal = document.getElementById("teacherModal");
+const teacherModalBackdrop = document.getElementById("teacherModalBackdrop");
+const teacherModalClose = document.getElementById("teacherModalClose");
+const teacherModalTitle = document.getElementById("teacherModalTitle");
+const teacherModalBody = document.getElementById("teacherModalBody");
+
+let teacherModalHideTimer = null;
 
 const THEME_KEY = "schedule_theme";
 const VIEW_KEY = "schedule_view";
@@ -79,46 +86,57 @@ const teachersData = [
   {
     name: "Кубрикова Анна Сергеевна",
     subjects: ["Основы российской государственности"],
+    department: "",
   },
   {
     name: "Сизых Ирина Сергеевна",
     subjects: ["История России"],
+    department: "",
   },
   {
     name: "Медников Дмитрий Михайлович",
     subjects: ["Иностранный язык"],
+    department: "",
   },
   {
     name: "Подпорина Наталья Михайловна",
     subjects: ["Иностранный язык"],
+    department: "",
   },
   {
     name: "Лозовой Александр Александрович",
     subjects: ["Физическая культура и спорт"],
+    department: "",
   },
   {
     name: "Жданов Олег Николаевич",
     subjects: ["Введение в высшую математику"],
+    department: "",
   },
   {
     name: "Семенкова Арина Алексеевна",
     subjects: ["Общий физический практикум"],
+    department: "",
   },
   {
     name: "Охоткина Евгения Александровна",
     subjects: ["Общий физический практикум", "Введение в технику физического эксперимента"],
+    department: "",
   },
   {
     name: "Золотова Ольга Павловна",
     subjects: ["Информационные технологии в науке и образовании"],
+    department: "",
   },
   {
     name: "Лукьянов Михаил Михайлович",
     subjects: ["Информационные технологии в науке и образовании"],
+    department: "",
   },
   {
     name: "Телегин Сергей Владимирович",
     subjects: ["Механика"],
+    department: "",
   },
 ];
 
@@ -710,7 +728,7 @@ function renderTeachers() {
     card.appendChild(name);
     card.appendChild(subjects);
     card.addEventListener("click", () => {
-      card.classList.toggle("is-open");
+      openTeacherModal(teacher);
     });
     teachersList.appendChild(card);
   });
@@ -735,6 +753,86 @@ function closeTeachersOverlay() {
   };
   teachersOverlay.addEventListener("transitionend", onEnd);
   document.body.classList.remove("is-overlay-open");
+}
+
+function openTeacherModal(teacher) {
+  if (!teacherModal || !teacherModalTitle || !teacherModalBody) return;
+  if (teacherModalHideTimer) {
+    clearTimeout(teacherModalHideTimer);
+    teacherModalHideTimer = null;
+  }
+  const department = teacher.department ? teacher.department : "Кафедра не указана";
+  teacherModalTitle.textContent = teacher.name;
+  teacherModalBody.textContent = `${teacher.subjects.join(", ")}\n${department}`;
+  teacherModal.classList.remove("is-hidden");
+  teacherModal.classList.add("is-visible");
+}
+
+function closeTeacherModal() {
+  if (!teacherModal) return;
+  teacherModal.classList.remove("is-visible");
+  if (teacherModalHideTimer) {
+    clearTimeout(teacherModalHideTimer);
+  }
+  teacherModalHideTimer = setTimeout(() => {
+    teacherModal.classList.add("is-hidden");
+    teacherModalHideTimer = null;
+  }, 200);
+}
+
+function enableMobileSwipeBack() {
+  if (!teachersOverlay) return;
+  const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+  if (!isTouchDevice) return;
+
+  const EDGE_SIZE = 24;
+  const TRIGGER_DISTANCE = 70;
+  const MAX_VERTICAL_DRIFT = 35;
+  let startX = 0;
+  let startY = 0;
+  let tracking = false;
+
+  const shouldTrack = () =>
+    !teachersOverlay.classList.contains("is-hidden") &&
+    teachersOverlay.classList.contains("is-visible");
+
+  teachersOverlay.addEventListener("touchstart", (event) => {
+    if (!shouldTrack()) return;
+    const touch = event.touches[0];
+    if (!touch || touch.clientX > EDGE_SIZE) {
+      tracking = false;
+      return;
+    }
+    tracking = true;
+    startX = touch.clientX;
+    startY = touch.clientY;
+  });
+
+  teachersOverlay.addEventListener("touchmove", (event) => {
+    if (!tracking) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - startX;
+    const deltaY = touch.clientY - startY;
+
+    if (deltaX < 0) {
+      tracking = false;
+      return;
+    }
+
+    if (deltaX > TRIGGER_DISTANCE && Math.abs(deltaY) < MAX_VERTICAL_DRIFT) {
+      tracking = false;
+      if (teacherModal && teacherModal.classList.contains("is-visible")) {
+        closeTeacherModal();
+      } else {
+        closeTeachersOverlay();
+      }
+    }
+  });
+
+  teachersOverlay.addEventListener("touchend", () => {
+    tracking = false;
+  });
 }
 
 function setTodayDefaults() {
@@ -864,9 +962,15 @@ async function init() {
   });
   if (openTeachers) openTeachers.addEventListener("click", openTeachersOverlay);
   if (teachersBack) teachersBack.addEventListener("click", closeTeachersOverlay);
+  if (teacherModalClose) teacherModalClose.addEventListener("click", closeTeacherModal);
+  if (teacherModalBackdrop) teacherModalBackdrop.addEventListener("click", closeTeacherModal);
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeTeachersOverlay();
   });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeTeacherModal();
+  });
+  enableMobileSwipeBack();
 
   requestAnimationFrame(() => {
     document.body.classList.add("is-ready");
