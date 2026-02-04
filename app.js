@@ -151,6 +151,21 @@ const teachersData = [
   },
 ];
 
+const AUTO_WEEK_START = new Date(2026, 1, 9);
+
+function toLocalDateOnly(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function getAutoWeekNumber() {
+  const start = toLocalDateOnly(AUTO_WEEK_START);
+  const today = toLocalDateOnly(new Date());
+  const diffDays = Math.floor((today - start) / (24 * 60 * 60 * 1000));
+  if (diffDays < 0) return 1;
+  const weeksSince = Math.floor(diffDays / 7);
+  return weeksSince % 2 === 0 ? 1 : 2;
+}
+
 function setWeek(week) {
   state.week = week;
   weekButtons.forEach((btn) => {
@@ -1012,7 +1027,7 @@ async function init() {
     btn.classList.toggle("active", btn.dataset.subgroup === storedSubgroup)
   );
 
-  setWeek(1);
+  setWeek(getAutoWeekNumber());
   setTodayDefaults();
   setDay(state.day);
 
