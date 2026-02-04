@@ -222,43 +222,79 @@ function splitEntry(raw) {
   };
 }
 
+function splitEntrySegments(raw) {
+  const lines = normalizeLines(raw);
+  const segments = [];
+  if (!lines.length) {
+    return [{ title: "Без названия", details: [] }];
+  }
+  let current = { title: lines[0] || "Без названия", details: [] };
+  for (let i = 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    const prevLine = lines[i - 1];
+    const prevHasMarker = /\s*-\s*[12]\s*$/.test(prevLine);
+    const startsNewTitle = prevHasMarker && !line.toLowerCase().startsWith("ауд.");
+    if (startsNewTitle) {
+      segments.push(current);
+      current = { title: line, details: [] };
+      continue;
+    }
+    current.details.push(line);
+  }
+  segments.push(current);
+  return segments;
+}
+
 function getEntryId(entry) {
   if (entry?._id === undefined || entry._id === null) return "";
   return `entry-${entry._id}`;
 }
 
-function getDisplayLinesForEntry(entry) {
-  const { title, details } = splitEntry(entry.raw);
-  const subgroupInfo = parseSubgroupLines(details);
-  let displayLines = [];
+function getDisplayBlocksForEntry(entry) {
+  const segments = splitEntrySegments(entry.raw);
+  const blocks = [];
 
-  if (state.subgroup === "all") {
-    displayLines = [...subgroupInfo.plain];
-    if (subgroupInfo.hasMarkers) {
-      if (subgroupInfo.map[1].length) {
-        displayLines.push(`Подгруппа 1: ${subgroupInfo.map[1].join("; ")}`);
-      }
-      if (subgroupInfo.map[2].length) {
-        displayLines.push(`Подгруппа 2: ${subgroupInfo.map[2].join("; ")}`);
-      }
-    }
-  } else {
-    const subgroup = Number(state.subgroup);
-    if (subgroupInfo.hasMarkers) {
-      const subgroupLines = subgroupInfo.map[subgroup] || [];
-      if (!subgroupLines.length) {
-        return null;
-      }
-      displayLines = [...subgroupInfo.plain, ...subgroupLines];
-    } else {
+  segments.forEach((segment) => {
+    const subgroupInfo = parseSubgroupLines(segment.details);
+    let displayLines = [];
+
+    if (state.subgroup === "all") {
       displayLines = [...subgroupInfo.plain];
+      if (subgroupInfo.hasMarkers) {
+        if (subgroupInfo.map[1].length) {
+          displayLines.push(`Подгруппа 1: ${subgroupInfo.map[1].join("; ")}`);
+        }
+        if (subgroupInfo.map[2].length) {
+          displayLines.push(`Подгруппа 2: ${subgroupInfo.map[2].join("; ")}`);
+        }
+      }
+    } else {
+      const subgroup = Number(state.subgroup);
+      if (subgroupInfo.hasMarkers) {
+        const subgroupLines = subgroupInfo.map[subgroup] || [];
+        if (!subgroupLines.length) {
+          return;
+        }
+        displayLines = [...subgroupInfo.plain, ...subgroupLines];
+      } else {
+        displayLines = [...subgroupInfo.plain];
+      }
     }
-  }
 
-  return { title, displayLines };
+    blocks.push({ title: segment.title, displayLines });
+  });
+
+  if (!blocks.length) return null;
+  return { blocks };
 }
 
-function createClassCard(entry, displayLines, title) {
+function pickPrimaryBlock(entry) {
+  const info = getDisplayBlocksForEntry(entry);
+  if (!info || !info.blocks.length) return null;
+  return info.blocks[0];
+}
+
+function createClassCard(entry, blocks) {
   const card = document.createElement("div");
   card.className = "class-card";
   const entryId = getEntryId(entry);
@@ -271,21 +307,24 @@ function createClassCard(entry, displayLines, title) {
   time.className = "class-time";
   time.textContent = entry.time;
 
-  const titleEl = document.createElement("div");
-  titleEl.className = "class-title";
-  titleEl.textContent = title;
-
-  const linesWrap = document.createElement("div");
-  linesWrap.className = "class-lines";
-  displayLines.forEach((line) => {
-    const span = document.createElement("span");
-    span.textContent = line;
-    linesWrap.appendChild(span);
-  });
-
   card.appendChild(time);
-  card.appendChild(titleEl);
-  card.appendChild(linesWrap);
+
+  blocks.forEach((block) => {
+    const titleEl = document.createElement("div");
+    titleEl.className = "class-title";
+    titleEl.textContent = block.title;
+
+    const linesWrap = document.createElement("div");
+    linesWrap.className = "class-lines";
+    block.displayLines.forEach((line) => {
+      const span = document.createElement("span");
+      span.textContent = line;
+      linesWrap.appendChild(span);
+    });
+
+    card.appendChild(titleEl);
+    card.appendChild(linesWrap);
+  });
 
   const progress = document.createElement("div");
   progress.className = "class-progress-fill";
@@ -408,9 +447,9 @@ function renderClasses() {
   }
 
   entries.forEach((entry) => {
-    const info = getDisplayLinesForEntry(entry);
+    const info = getDisplayBlocksForEntry(entry);
     if (!info) return;
-    const card = createClassCard(entry, info.displayLines, info.title);
+    const card = createClassCard(entry, info.blocks);
     classesWrap.appendChild(card);
   });
 
@@ -458,16 +497,10 @@ function renderNextClass(entries) {
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
     const upcoming = entriesWithMinutes.find((entry) => entry.start > nowMinutes);
     if (upcoming) {
-      const { title, details } = splitEntry(upcoming.raw);
-      const subgroupInfo = parseSubgroupLines(details);
-      const detailLine =
-        state.subgroup === "all"
-          ? subgroupInfo.plain[0] || subgroupInfo.map[1][0] || subgroupInfo.map[2][0] || "Без аудитории"
-          : subgroupInfo.plain[0] ||
-            (subgroupInfo.map[Number(state.subgroup)] || [])[0] ||
-            "Без аудитории";
+      const primary = pickPrimaryBlock(upcoming);
+      const detailLine = primary?.displayLines[0] || "Без аудитории";
       nextLabel.textContent = "Следующая пара";
-      nextClassTitle.textContent = title;
+      nextClassTitle.textContent = primary?.title || "Без названия";
       nextClassMeta.textContent = `${upcoming.time} • ${detailLine}`;
       return;
     }
@@ -479,16 +512,10 @@ function renderNextClass(entries) {
   }
 
   const first = entriesWithMinutes[0];
-  const { title, details } = splitEntry(first.raw);
-  const subgroupInfo = parseSubgroupLines(details);
-  const detailLine =
-    state.subgroup === "all"
-      ? subgroupInfo.plain[0] || subgroupInfo.map[1][0] || subgroupInfo.map[2][0] || "Без аудитории"
-      : subgroupInfo.plain[0] ||
-        (subgroupInfo.map[Number(state.subgroup)] || [])[0] ||
-        "Без аудитории";
+  const primary = pickPrimaryBlock(first);
+  const detailLine = primary?.displayLines[0] || "Без аудитории";
   nextLabel.textContent = "Первая пара";
-  nextClassTitle.textContent = title;
+  nextClassTitle.textContent = primary?.title || "Без названия";
   nextClassMeta.textContent = `${first.time} • ${detailLine}`;
 }
 
@@ -556,7 +583,7 @@ function renderSearchResults(query) {
   }
 
   results.forEach((entry) => {
-    const info = getDisplayLinesForEntry(entry);
+    const info = getDisplayBlocksForEntry(entry);
     if (!info) return;
     const item = document.createElement("div");
     item.className = "search-item";
@@ -575,11 +602,12 @@ function renderSearchResults(query) {
 
     const title = document.createElement("div");
     title.className = "search-title";
-    title.textContent = info.title;
+    const primary = info.blocks[0];
+    title.textContent = primary?.title || "Без названия";
 
     const meta = document.createElement("div");
     meta.className = "search-meta";
-    const detail = info.displayLines[0] || "Без аудитории";
+    const detail = primary?.displayLines[0] || "Без аудитории";
     meta.textContent = `${entry.day} • ${entry.time} • ${entry.week} неделя • ${detail}`;
 
     item.appendChild(title);
@@ -633,9 +661,9 @@ function renderWeek() {
     weekEntries
       .filter((entry) => entry.day === day)
       .forEach((entry) => {
-        const info = getDisplayLinesForEntry(entry);
+        const info = getDisplayBlocksForEntry(entry);
         if (!info) return;
-        const card = createClassCard(entry, info.displayLines, info.title);
+        const card = createClassCard(entry, info.blocks);
         dayWrap.appendChild(card);
       });
 
