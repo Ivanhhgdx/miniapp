@@ -155,14 +155,13 @@ const teachersData = [
 const AUTO_WEEK_START = new Date(2026, 1, 9);
 const AUTO_WEEK_AT_START = 2;
 
-function toLocalDateOnly(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+function getUtcDayNumber(date) {
+  // Compute by calendar date parts (stable across DST transitions).
+  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
 }
 
 function getAutoWeekNumber() {
-  const start = toLocalDateOnly(AUTO_WEEK_START);
-  const today = toLocalDateOnly(new Date());
-  const diffDays = Math.floor((today - start) / 86400000);
+  const diffDays = getUtcDayNumber(new Date()) - getUtcDayNumber(AUTO_WEEK_START);
   const weeksSince = Math.floor(diffDays / 7);
   const parity = ((weeksSince % 2) + 2) % 2;
   return parity === 0 ? AUTO_WEEK_AT_START : 3 - AUTO_WEEK_AT_START;
