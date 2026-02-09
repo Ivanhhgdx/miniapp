@@ -949,6 +949,13 @@ async function init() {
     window.Telegram.WebApp.expand();
   }
 
+  const pageQuery = window.location.search.replace(/^\?/, "");
+
+  function withPageQuery(url) {
+    if (!pageQuery) return url;
+    return url.includes("?") ? `${url}&${pageQuery}` : `${url}?${pageQuery}`;
+  }
+
   async function safeFetch(url, fallback) {
     try {
       const res = await fetch(url);
@@ -959,8 +966,8 @@ async function init() {
     }
   }
 
-  state.data = await safeFetch("data/schedule.json", window.SCHEDULE_DATA);
-  state.session = await safeFetch("data/session_upcoming.json", window.SESSION_DATA);
+  state.data = await safeFetch(withPageQuery("data/schedule.json"), window.SCHEDULE_DATA);
+  state.session = await safeFetch(withPageQuery("data/session_upcoming.json"), window.SESSION_DATA);
 
   if (state.data?.schedule) {
     state.data.schedule.forEach((entry, index) => {
