@@ -153,6 +153,7 @@ const teachersData = [
 ];
 
 const AUTO_WEEK_START = new Date(2026, 1, 9);
+const AUTO_WEEK_AT_START = 2;
 
 function toLocalDateOnly(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -161,10 +162,10 @@ function toLocalDateOnly(date) {
 function getAutoWeekNumber() {
   const start = toLocalDateOnly(AUTO_WEEK_START);
   const today = toLocalDateOnly(new Date());
-  const diffDays = Math.floor((today - start) / (24 * 60 * 60 * 1000));
-  if (diffDays < 0) return 1;
+  const diffDays = Math.floor((today - start) / 86400000);
   const weeksSince = Math.floor(diffDays / 7);
-  return weeksSince % 2 === 0 ? 1 : 2;
+  const parity = ((weeksSince % 2) + 2) % 2;
+  return parity === 0 ? AUTO_WEEK_AT_START : 3 - AUTO_WEEK_AT_START;
 }
 
 function setWeek(week) {
