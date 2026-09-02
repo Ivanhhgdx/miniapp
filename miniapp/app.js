@@ -72,8 +72,8 @@ const examMaterials = {
   },
 };
 
-const AUTO_WEEK_START = new Date(2026, 1, 9);
-const AUTO_WEEK_AT_START = 2;
+const AUTO_WEEK_START = new Date(2026, 7, 31);
+const AUTO_WEEK_AT_START = 1;
 
 function getUtcDayNumber(date) {
   // Compute by calendar date parts (stable across DST transitions).
