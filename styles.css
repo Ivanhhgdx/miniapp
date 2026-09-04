@@ -303,6 +303,18 @@ body.is-ready .app-header {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.search-box.liquid-glass {
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.search-box.liquid-glass .search-input {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
 .search-clear {
   position: absolute;
   top: 50%;
@@ -1080,12 +1092,12 @@ body.is-overlay-open {
   --accent-soft: rgba(255, 128, 105, 0.2);
   --accent-2: #dff5ff;
   --card: rgba(8, 27, 39, 0.25);
-  --stroke: rgba(231, 247, 255, 0.3);
-  --stroke-strong: rgba(245, 252, 255, 0.58);
+  --stroke: rgba(231, 247, 255, 0.22);
+  --stroke-strong: rgba(245, 252, 255, 0.42);
   --glass: rgba(10, 28, 40, 0.2);
   --active-bg: rgba(247, 252, 255, 0.24);
   --active-ink: #ffffff;
-  --shadow: 0 16px 42px rgba(2, 13, 22, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  --shadow: 0 16px 42px rgba(2, 13, 22, 0.22);
 }
 
 html[data-theme="dark"] {
@@ -1140,8 +1152,8 @@ body {
   background-image: url("assets/university-rocket.jpg");
   background-position: center center;
   background-size: cover;
-  filter: blur(4px) saturate(1.08);
-  transform: scale(1.025);
+  filter: blur(2px) saturate(1.06);
+  transform: scale(1.012);
 }
 
 .page-scrim {
@@ -1198,18 +1210,12 @@ html[data-theme="nord"] .page-scrim {
   background: var(--panel);
   border-color: var(--stroke);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(16px) saturate(1.28);
-  -webkit-backdrop-filter: blur(16px) saturate(1.28);
+  backdrop-filter: saturate(1.16);
+  -webkit-backdrop-filter: saturate(1.16);
 }
 
 .liquid-glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 1px 0 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-  pointer-events: none;
+  display: none;
 }
 
 .liquid-lens {
@@ -1219,7 +1225,7 @@ html[data-theme="nord"] .page-scrim {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  opacity: 0.98;
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -1294,7 +1300,7 @@ html[data-theme="nord"] .page-scrim {
   background: var(--card);
   border-color: var(--stroke);
   color: var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 8px 24px rgba(2, 14, 22, 0.1);
+  box-shadow: 0 8px 24px rgba(2, 14, 22, 0.1);
   backdrop-filter: blur(18px) saturate(1.25);
   -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
@@ -1405,8 +1411,8 @@ html[data-theme="nord"] .page-scrim {
 
   .page-background {
     background-position: 50% center;
-    filter: blur(4px) saturate(1.06);
-    transform: scale(1.03);
+    filter: blur(2px) saturate(1.04);
+    transform: scale(1.015);
   }
 
   .app-header {
