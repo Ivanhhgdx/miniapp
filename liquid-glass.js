@@ -54,11 +54,22 @@
       vec2 drawnSize = u_image_size * coverScale;
       vec2 drawnOffset = (u_viewport - drawnSize) * 0.5;
       vec2 imageUv = clamp((screenPosition - drawnOffset) / drawnSize, 0.001, 0.999);
-      vec4 color = texture2D(u_image, vec2(imageUv.x, 1.0 - imageUv.y));
+      vec2 textureUv = vec2(imageUv.x, 1.0 - imageUv.y);
+      vec2 blurStep = vec2(4.0) / u_image_size;
+      vec4 color = texture2D(u_image, textureUv) * 0.24;
+      color += texture2D(u_image, textureUv + vec2(blurStep.x, 0.0)) * 0.12;
+      color += texture2D(u_image, textureUv - vec2(blurStep.x, 0.0)) * 0.12;
+      color += texture2D(u_image, textureUv + vec2(0.0, blurStep.y)) * 0.12;
+      color += texture2D(u_image, textureUv - vec2(0.0, blurStep.y)) * 0.12;
+      color += texture2D(u_image, textureUv + blurStep) * 0.07;
+      color += texture2D(u_image, textureUv - blurStep) * 0.07;
+      color += texture2D(u_image, textureUv + vec2(blurStep.x, -blurStep.y)) * 0.07;
+      color += texture2D(u_image, textureUv + vec2(-blurStep.x, blurStep.y)) * 0.07;
 
       float rimLight = pow(edgeLens, 3.0) * 0.04;
-      color.rgb = color.rgb * 1.035 + vec3(rimLight * 0.78, rimLight * 0.9, rimLight);
-      color.a = 0.86;
+      color.rgb = mix(color.rgb * 1.025, vec3(0.025, 0.075, 0.105), 0.22)
+        + vec3(rimLight * 0.78, rimLight * 0.9, rimLight);
+      color.a = 0.84;
       gl_FragColor = color;
     }
   `;

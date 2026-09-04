@@ -1087,7 +1087,7 @@ body.is-overlay-open {
   --panel: rgba(13, 33, 46, 0.27);
   --panel-strong: rgba(18, 42, 56, 0.38);
   --ink: #ffffff;
-  --muted: rgba(244, 250, 255, 0.7);
+  --muted: rgba(244, 250, 255, 0.84);
   --accent: #ff6d57;
   --accent-soft: rgba(255, 128, 105, 0.2);
   --accent-2: #dff5ff;
@@ -1137,7 +1137,7 @@ html[data-theme="nord"] {
 body {
   background: var(--bg);
   color: var(--ink);
-  text-shadow: 0 1px 12px rgba(2, 14, 22, 0.2);
+  text-shadow: 0 1px 5px rgba(0, 7, 12, 0.78);
 }
 
 .page-background,
@@ -1152,13 +1152,13 @@ body {
   background-image: url("assets/university-rocket.jpg");
   background-position: center center;
   background-size: cover;
-  filter: blur(2px) saturate(1.06);
-  transform: scale(1.012);
+  filter: saturate(1.04);
+  transform: none;
 }
 
 .page-scrim {
   z-index: 0;
-  background: rgba(4, 19, 29, 0.25);
+  background: rgba(4, 19, 29, 0.16);
 }
 
 html[data-theme="dark"] .page-scrim {
@@ -1279,6 +1279,11 @@ html[data-theme="nord"] .page-scrim {
 .modal-list,
 .teacher-modal-label {
   color: var(--muted);
+}
+
+.hero-label,
+.hero-sub {
+  opacity: 0.9;
 }
 
 .search-input,
@@ -1411,8 +1416,8 @@ html[data-theme="nord"] .page-scrim {
 
   .page-background {
     background-position: 50% center;
-    filter: blur(2px) saturate(1.04);
-    transform: scale(1.015);
+    filter: saturate(1.03);
+    transform: none;
   }
 
   .app-header {
