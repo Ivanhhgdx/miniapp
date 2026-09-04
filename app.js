@@ -16,7 +16,6 @@ const state = {
 };
 
 const weekButtons = document.querySelectorAll(".week-btn");
-const themeCycle = document.getElementById("themeCycle");
 const viewButtons = document.querySelectorAll(".view-btn");
 const dayChips = document.getElementById("dayChips");
 const classesWrap = document.getElementById("classes");
@@ -56,7 +55,6 @@ const teacherModalBody = document.getElementById("teacherModalBody");
 
 let teacherModalHideTimer = null;
 
-const THEME_KEY = "schedule_theme";
 const VIEW_KEY = "schedule_view";
 const SUBGROUP_KEY = "schedule_subgroup";
 
@@ -421,22 +419,6 @@ function pickDefaultDay(week) {
   }
 
   return dayOrder[0];
-}
-
-function setTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  if (themeCycle) {
-    const labels = { light: "Свет", dark: "Тьма", nord: "Норд" };
-    themeCycle.textContent = `Тема: ${labels[theme] || theme}`;
-  }
-  localStorage.setItem(THEME_KEY, theme);
-}
-
-function getNextTheme(theme) {
-  const order = ["light", "dark", "nord"];
-  const index = order.indexOf(theme);
-  if (index === -1) return order[0];
-  return order[(index + 1) % order.length];
 }
 
 function renderDayChips() {
@@ -999,17 +981,8 @@ async function init() {
     groupName.textContent = state.data.meta.group;
   }
 
-  const storedTheme = localStorage.getItem(THEME_KEY);
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const initialTheme = storedTheme || (prefersDark ? "dark" : "light");
-  setTheme(initialTheme);
-
-  if (themeCycle) {
-    themeCycle.addEventListener("click", () => {
-      const current = document.documentElement.dataset.theme || initialTheme;
-      setTheme(getNextTheme(current));
-    });
-  }
+  document.documentElement.removeAttribute("data-theme");
+  localStorage.removeItem("schedule_theme");
 
   viewButtons.forEach((btn) => {
     btn.addEventListener("click", () => setScheduleView(btn.dataset.view));

@@ -1644,3 +1644,65 @@ html[data-theme="nord"] .page-scrim {
     border-radius: 22px;
   }
 }
+
+/* Final unified glass surface — intentionally last in the cascade */
+*,
+*::before,
+*::after {
+  text-shadow: none !important;
+}
+
+.app-header,
+.panel:not(.search-panel),
+.hero-card,
+.search-input,
+.modal-card,
+.teacher-modal-card,
+.teacher-item {
+  background: rgba(231, 246, 253, 0.17) !important;
+  border: 0 !important;
+  box-shadow: 0 8px 24px rgba(2, 14, 22, 0.1) !important;
+  backdrop-filter: blur(18px) saturate(1.25) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
+}
+
+.panel.search-panel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.hero-card::before,
+.hero-card::after,
+.panel::before,
+.panel::after,
+.class-card::before,
+.class-card::after {
+  content: none !important;
+  display: none !important;
+  box-shadow: none !important;
+}
+
+.week-toggle,
+.subgroup-toggle,
+.view-toggle,
+.teacher-btn,
+.theme-cycle,
+.day-chip,
+.class-card,
+.session-item,
+.modal-section,
+.teacher-modal-block,
+.modal-close,
+.teacher-modal-close,
+.overlay-back,
+.search-item,
+.search-empty {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: rgba(231, 246, 253, 0.14) !important;
+  backdrop-filter: blur(18px) saturate(1.25) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
+}
