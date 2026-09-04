@@ -1741,6 +1741,19 @@ html[data-theme="nord"] .page-scrim {
   box-shadow: none !important;
 }
 
+#todayDate {
+  align-items: baseline;
+}
+
+#todayDate > span:last-child {
+  color: rgba(255, 255, 255, 0.96);
+  font-size: clamp(24px, 5vw, 32px);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  opacity: 1;
+}
+
 .app,
 .app-header,
 body.is-ready .app,

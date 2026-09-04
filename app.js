@@ -1034,6 +1034,12 @@ async function init() {
 
   if (searchInput) {
     searchInput.addEventListener("input", () => renderSearchResults(searchInput.value));
+
+    document.addEventListener("pointerdown", (event) => {
+      if (document.activeElement !== searchInput) return;
+      if (event.target.closest(".search-box")) return;
+      searchInput.blur();
+    });
   }
   if (searchClear) {
     searchClear.addEventListener("click", () => {
