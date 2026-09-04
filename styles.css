@@ -1072,6 +1072,131 @@ body.is-overlay-open {
   }
 }
 
+/* Borderless glassmorphism */
+:root,
+html[data-theme="dark"],
+html[data-theme="nord"] {
+  --panel: rgba(9, 25, 34, 0.4);
+  --panel-strong: rgba(10, 28, 38, 0.46);
+  --card: rgba(12, 31, 41, 0.34);
+  --stroke: transparent;
+  --stroke-strong: transparent;
+  --active-bg: rgba(241, 249, 252, 0.24);
+  --shadow: 0 22px 54px rgba(2, 12, 18, 0.24);
+}
+
+.app-header,
+.panel,
+.hero-card,
+.modal-card,
+.teacher-modal-card,
+.teacher-item,
+.search-input,
+.theme-cycle,
+.week-toggle,
+.subgroup-toggle,
+.view-toggle,
+.teacher-btn,
+.day-chip,
+.class-card,
+.session-item,
+.modal-section,
+.teacher-modal-block,
+.modal-close,
+.teacher-modal-close,
+.overlay-back,
+.search-item,
+.search-empty {
+  border: 0;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(22px) saturate(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.08);
+}
+
+.app-header,
+.panel,
+.hero-card {
+  border-radius: 28px;
+}
+
+.hero-card,
+.hero-card.accent {
+  background: rgba(8, 25, 34, 0.42);
+  border: 0;
+}
+
+.search-input {
+  background: rgba(8, 25, 34, 0.34);
+}
+
+.week-toggle,
+.subgroup-toggle,
+.view-toggle,
+.class-card,
+.session-item,
+.modal-section,
+.teacher-modal-block,
+.teacher-item {
+  background: rgba(229, 243, 248, 0.14);
+  box-shadow: 0 12px 30px rgba(2, 12, 18, 0.12);
+}
+
+.week-btn.active,
+.subgroup-btn.active,
+.view-btn.active,
+.day-chip.active {
+  border: 0;
+  background: rgba(244, 251, 253, 0.26);
+  box-shadow: 0 8px 20px rgba(2, 12, 18, 0.12);
+}
+
+.theme-cycle,
+.teacher-btn,
+.day-chip,
+.modal-close,
+.teacher-modal-close,
+.overlay-back {
+  background: rgba(229, 243, 248, 0.15);
+}
+
+.class-card::before {
+  display: none;
+}
+
+.app-header::before,
+.panel::before,
+.hero-card::before,
+.app-header::after,
+.panel::after {
+  display: none;
+}
+
+.theme-cycle:hover,
+.teacher-btn:hover,
+.day-chip:hover,
+.class-card:hover,
+.session-item:hover,
+.teacher-item:hover,
+.search-item:hover {
+  border: 0;
+  background: rgba(235, 247, 251, 0.21);
+}
+
+.overlay-head {
+  border: 0;
+  background: rgba(7, 24, 33, 0.46);
+  box-shadow: 0 18px 40px rgba(2, 12, 18, 0.18);
+}
+
+@media (max-width: 560px) {
+  .app-header,
+  .panel,
+  .hero-card {
+    border-radius: 24px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
