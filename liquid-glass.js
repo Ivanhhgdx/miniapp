@@ -25,22 +25,30 @@
     uniform vec2 u_rect_size;
     uniform vec2 u_image_size;
 
+    float roundedBoxSdf(vec2 point, vec2 halfSize, float radius) {
+      vec2 distanceToEdge = abs(point) - (halfSize - vec2(radius));
+      return length(max(distanceToEdge, 0.0))
+        + min(max(distanceToEdge.x, distanceToEdge.y), 0.0)
+        - radius;
+    }
+
     void main() {
       vec2 local = vec2(v_uv.x, 1.0 - v_uv.y);
-      vec2 centered = local * 2.0 - 1.0;
-      vec2 aspectCentered = vec2(centered.x * (u_rect_size.x / max(u_rect_size.y, 1.0)), centered.y);
-      vec2 direction = normalize(aspectCentered + vec2(0.0001));
-
       vec2 pixelPosition = local * u_rect_size;
       vec2 halfSize = u_rect_size * 0.5;
       float cornerRadius = min(26.0, min(halfSize.x, halfSize.y));
-      vec2 roundedDistance = abs(pixelPosition - halfSize) - (halfSize - vec2(cornerRadius));
-      float signedDistance = length(max(roundedDistance, 0.0))
-        + min(max(roundedDistance.x, roundedDistance.y), 0.0)
-        - cornerRadius;
+      vec2 glassPoint = pixelPosition - halfSize;
+      float signedDistance = roundedBoxSdf(glassPoint, halfSize, cornerRadius);
       float insideDistance = max(0.0, -signedDistance);
       float edgeLens = 1.0 - smoothstep(0.0, 8.0, insideDistance);
-      vec2 screenPosition = u_rect_position + local * u_rect_size - direction * edgeLens * 7.0;
+      float normalStep = 0.75;
+      vec2 edgeNormal = normalize(vec2(
+        roundedBoxSdf(glassPoint + vec2(normalStep, 0.0), halfSize, cornerRadius)
+          - roundedBoxSdf(glassPoint - vec2(normalStep, 0.0), halfSize, cornerRadius),
+        roundedBoxSdf(glassPoint + vec2(0.0, normalStep), halfSize, cornerRadius)
+          - roundedBoxSdf(glassPoint - vec2(0.0, normalStep), halfSize, cornerRadius)
+      ) + vec2(0.0001));
+      vec2 screenPosition = u_rect_position + local * u_rect_size - edgeNormal * edgeLens * 7.0;
 
       float coverScale = max(u_viewport.x / u_image_size.x, u_viewport.y / u_image_size.y);
       vec2 drawnSize = u_image_size * coverScale;
