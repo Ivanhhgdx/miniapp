@@ -1762,3 +1762,22 @@ body.is-ready .app-header {
   transform: none !important;
   transition: none !important;
 }
+
+/* Scroll-linked background focus: content becomes calmer and easier to read. */
+:root {
+  --scroll-bg-blur: 0px;
+  --scroll-bg-dim: 0.16;
+}
+
+.page-background {
+  filter: saturate(1.04) blur(var(--scroll-bg-blur));
+  will-change: filter;
+}
+
+.page-scrim,
+html[data-theme="dark"] .page-scrim,
+html[data-theme="nord"] .page-scrim {
+  background: rgb(1, 10, 16);
+  opacity: var(--scroll-bg-dim);
+  will-change: opacity;
+}

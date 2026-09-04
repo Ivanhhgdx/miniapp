@@ -930,7 +930,30 @@ function setTodayDefaults() {
   state.day = pickDefaultDay(state.week);
 }
 
+function enableScrollLinkedBackground() {
+  const root = document.documentElement;
+  let frame = 0;
+
+  const update = () => {
+    frame = 0;
+    const distance = Math.max(520, window.innerHeight * 0.9);
+    const progress = Math.min(1, Math.max(0, window.scrollY / distance));
+    root.style.setProperty("--scroll-bg-blur", `${(progress * 16).toFixed(2)}px`);
+    root.style.setProperty("--scroll-bg-dim", (0.16 + progress * 0.34).toFixed(3));
+  };
+
+  const requestUpdate = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(update);
+  };
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate, { passive: true });
+  update();
+}
+
 async function init() {
+  enableScrollLinkedBackground();
   if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.ready();
     window.Telegram.WebApp.expand();
