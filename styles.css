@@ -1763,21 +1763,78 @@ body.is-ready .app-header {
   transition: none !important;
 }
 
-/* Scroll-linked background focus: content becomes calmer and easier to read. */
-:root {
-  --scroll-bg-blur: 0px;
-  --scroll-bg-dim: 0.16;
-}
-
+/* Premium material system: legibility comes from each surface, not a dirty global dim. */
 .page-background {
-  filter: saturate(1.04) blur(var(--scroll-bg-blur));
-  will-change: filter;
+  filter: saturate(0.92) contrast(0.96) brightness(0.94);
 }
 
 .page-scrim,
 html[data-theme="dark"] .page-scrim,
 html[data-theme="nord"] .page-scrim {
-  background: rgb(1, 10, 16);
-  opacity: var(--scroll-bg-dim);
-  will-change: opacity;
+  background: linear-gradient(180deg, rgba(2, 15, 23, 0.08), rgba(2, 15, 23, 0.18));
+  opacity: 1;
+}
+
+.app-header,
+.panel:not(.search-panel),
+.hero-card,
+.modal-card,
+.teacher-modal-card,
+.teacher-item {
+  background:
+    linear-gradient(135deg, rgba(237, 249, 255, 0.18), rgba(8, 28, 40, 0.54)) !important;
+  border: 1px solid rgba(247, 252, 255, 0.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 18px 48px rgba(0, 9, 15, 0.2) !important;
+  backdrop-filter: blur(30px) saturate(0.9) brightness(0.82) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(0.9) brightness(0.82) !important;
+}
+
+.hero-card.accent {
+  background:
+    linear-gradient(135deg, rgba(226, 246, 255, 0.17), rgba(5, 26, 38, 0.64)) !important;
+}
+
+.search-input {
+  background: rgba(7, 26, 38, 0.48) !important;
+  border: 1px solid rgba(247, 252, 255, 0.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(26px) saturate(0.88) brightness(0.84) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(0.88) brightness(0.84) !important;
+}
+
+.week-toggle,
+.subgroup-toggle,
+.view-toggle,
+.teacher-btn,
+.theme-cycle,
+.day-chip,
+.session-item,
+.modal-section,
+.teacher-modal-block,
+.modal-close,
+.teacher-modal-close,
+.overlay-back,
+.search-item,
+.search-empty {
+  background: rgba(226, 244, 252, 0.13) !important;
+  border: 1px solid rgba(248, 253, 255, 0.1) !important;
+  backdrop-filter: blur(22px) saturate(0.92) brightness(0.88) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(0.92) brightness(0.88) !important;
+}
+
+.class-card {
+  background: rgba(5, 24, 35, 0.48) !important;
+  border: 1px solid rgba(244, 251, 255, 0.12) !important;
+  backdrop-filter: blur(24px) saturate(0.88) brightness(0.8) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(0.88) brightness(0.8) !important;
+}
+
+.week-btn.active,
+.subgroup-btn.active,
+.view-btn.active,
+.day-chip.active {
+  background: rgba(236, 249, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
 }
