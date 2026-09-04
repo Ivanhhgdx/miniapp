@@ -6,11 +6,12 @@
     <title>Расписание БФК25-01</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta name="theme-color" content="#f1efe9" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Rubik:wght@600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Prata&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=5" />
+    <link rel="stylesheet" href="styles.css?v=6" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
@@ -33,7 +34,7 @@
       <section class="panel search-panel">
         <div class="panel-head">
           <h2>Поиск</h2>
-          <div class="panel-hint">Предмет, преподаватель или аудитория • Премиум</div>
+          <div class="panel-hint">Предмет, преподаватель или аудитория</div>
         </div>
         <div class="search-box">
           <input
@@ -43,7 +44,7 @@
             placeholder="Поиск"
             autocomplete="off"
           />
-          <button class="search-clear" id="searchClear" type="button" aria-label="Очистить">x</button>
+          <button class="search-clear" id="searchClear" type="button" aria-label="Очистить">×</button>
         </div>
         <div class="search-results" id="searchResults"></div>
       </section>
@@ -61,9 +62,9 @@
         </div>
       </section>
 
-      <section class="panel">
+      <section class="panel controls-panel">
         <div class="panel-head">
-          <h2>Раздел</h2>
+          <h2>Параметры</h2>
           <div class="panel-hint" id="todayHint"></div>
         </div>
         <div class="week-toggle" role="tablist">
@@ -92,7 +93,7 @@
 
       <section class="panel schedule-panel">
         <div class="panel-head">
-          <h2>Пары</h2>
+          <h2>Расписание на день</h2>
           <div class="panel-hint" id="daySummary"></div>
         </div>
         <div class="classes" id="classes"></div>
@@ -101,7 +102,7 @@
       <section class="panel week-panel is-hidden" id="weekPanel">
         <div class="panel-head">
           <h2>Неделя</h2>
-          <div class="panel-hint">Все пары за неделю • Премиум</div>
+          <div class="panel-hint">Все пары за неделю</div>
         </div>
         <div class="week-classes" id="weekClasses"></div>
       </section>
@@ -145,6 +146,6 @@
     </div>
 
     <script src="data/data.js?v=5"></script>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>
