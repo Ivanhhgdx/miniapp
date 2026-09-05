@@ -1763,53 +1763,60 @@ body.is-ready .app-header {
   transition: none !important;
 }
 
-/* Premium material system: legibility comes from each surface, not a dirty global dim. */
+/* Clean frosted glass: one luminous surface, no rims or stacked dimming. */
+:root,
+html[data-theme="dark"],
+html[data-theme="nord"] {
+  --ink: #142c3c;
+  --muted: #294353;
+  --accent: #245771;
+  --accent-2: #245771;
+  --stroke: transparent;
+  --stroke-strong: transparent;
+  --active-bg: rgba(255, 255, 255, 0.78);
+  --active-ink: #142c3c;
+  --frost: rgba(239, 247, 252, 0.72);
+  --frost-inner: rgba(255, 255, 255, 0.24);
+  --frost-hover: rgba(255, 255, 255, 0.44);
+  --frost-shadow: 0 12px 36px rgba(14, 38, 54, 0.09);
+}
+
 .page-background {
-  filter: saturate(0.92) contrast(0.96) brightness(0.94);
+  filter: saturate(1.04);
 }
 
 .page-scrim,
 html[data-theme="dark"] .page-scrim,
 html[data-theme="nord"] .page-scrim {
-  background: linear-gradient(180deg, rgba(2, 15, 23, 0.08), rgba(2, 15, 23, 0.18));
+  background: rgba(15, 39, 55, 0.04);
   opacity: 1;
 }
 
 .app-header,
 .panel:not(.search-panel),
 .hero-card,
+.hero-card.accent,
+.search-input,
 .modal-card,
 .teacher-modal-card,
-.teacher-item {
-  background:
-    linear-gradient(135deg, rgba(237, 249, 255, 0.18), rgba(8, 28, 40, 0.54)) !important;
-  border: 1px solid rgba(247, 252, 255, 0.18) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 18px 48px rgba(0, 9, 15, 0.2) !important;
-  backdrop-filter: blur(30px) saturate(0.9) brightness(0.82) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(0.9) brightness(0.82) !important;
+.teacher-item,
+.overlay-head {
+  color: var(--ink);
+  background: var(--frost) !important;
+  border: 0 !important;
+  box-shadow: var(--frost-shadow) !important;
+  backdrop-filter: blur(32px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(1.12) !important;
 }
 
-.hero-card.accent {
-  background:
-    linear-gradient(135deg, rgba(226, 246, 255, 0.17), rgba(5, 26, 38, 0.64)) !important;
-}
-
-.search-input {
-  background: rgba(7, 26, 38, 0.48) !important;
-  border: 1px solid rgba(247, 252, 255, 0.16) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(26px) saturate(0.88) brightness(0.84) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(0.88) brightness(0.84) !important;
-}
-
+/* Nested controls share the parent's frost instead of filtering it again. */
 .week-toggle,
 .subgroup-toggle,
 .view-toggle,
 .teacher-btn,
 .theme-cycle,
 .day-chip,
+.class-card,
 .session-item,
 .modal-section,
 .teacher-modal-block,
@@ -1818,23 +1825,118 @@ html[data-theme="nord"] .page-scrim {
 .overlay-back,
 .search-item,
 .search-empty {
-  background: rgba(226, 244, 252, 0.13) !important;
-  border: 1px solid rgba(248, 253, 255, 0.1) !important;
-  backdrop-filter: blur(22px) saturate(0.92) brightness(0.88) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(0.92) brightness(0.88) !important;
+  color: var(--ink);
+  background: var(--frost-inner) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-.class-card {
-  background: rgba(5, 24, 35, 0.48) !important;
-  border: 1px solid rgba(244, 251, 255, 0.12) !important;
-  backdrop-filter: blur(24px) saturate(0.88) brightness(0.8) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(0.88) brightness(0.8) !important;
+/* Search results sit directly over the photograph, outside a frosted panel. */
+.search-item,
+.search-empty {
+  background: var(--frost) !important;
+  backdrop-filter: blur(32px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(1.12) !important;
+}
+
+.week-btn,
+.subgroup-btn,
+.view-btn,
+.day-chip,
+.search-input::placeholder {
+  color: var(--muted);
 }
 
 .week-btn.active,
 .subgroup-btn.active,
 .view-btn.active,
 .day-chip.active {
-  background: rgba(236, 249, 255, 0.28) !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: var(--active-ink);
+  background: var(--active-bg) !important;
+  border: 0 !important;
+  box-shadow: 0 3px 12px rgba(14, 38, 54, 0.06) !important;
+}
+
+/* Keep readable text when touch browsers retain a hover state after a tap. */
+.theme-cycle:hover,
+.teacher-btn:hover,
+.day-chip:hover,
+.class-card:hover,
+.session-item:hover,
+.teacher-item:hover,
+.search-item:hover {
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .teacher-btn:hover,
+  .theme-cycle:hover,
+  .day-chip:not(.active):hover,
+  .class-card:hover,
+  .session-item:hover,
+  .modal-close:hover,
+  .teacher-modal-close:hover,
+  .overlay-back:hover {
+    color: var(--ink);
+    background: var(--frost-hover) !important;
+  }
+
+  .search-item:hover,
+  .teacher-item:hover {
+    color: var(--ink);
+    background: rgba(244, 250, 253, 0.84) !important;
+  }
+}
+
+.hero-label,
+.hero-sub {
+  color: var(--muted);
+  opacity: 1;
+}
+
+#todayDate > span:last-child,
+.class-time,
+.teacher-modal-value,
+.modal-section-title {
+  color: var(--ink);
+}
+
+.search-icon {
+  stroke: var(--muted);
+}
+
+.search-clear {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.week-day-title,
+.empty {
+  border: 0;
+}
+
+.class-progress-fill,
+.class-card.is-live .class-progress-fill,
+.class-card.is-past .class-progress-fill {
+  background: rgba(54, 117, 150, 0.12) !important;
+}
+
+.overlay {
+  color: var(--ink);
+  background: rgba(226, 239, 247, 0.72);
+  backdrop-filter: blur(32px) saturate(1.12);
+  -webkit-backdrop-filter: blur(32px) saturate(1.12);
+}
+
+/* A solid, borderless fallback preserves contrast without backdrop filtering. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --frost: #e8f1f7;
+  }
+
+  .overlay {
+    background: #e8f1f7;
+  }
 }
