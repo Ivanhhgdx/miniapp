@@ -1940,3 +1940,250 @@ html[data-theme="nord"] .page-scrim {
     background: #e8f1f7;
   }
 }
+
+/* Compact daily overview and comfortable controls. */
+[hidden] {
+  display: none !important;
+}
+
+.today-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-content: center;
+  min-height: 112px;
+}
+
+.today-card .hero-label,
+.today-card .hero-value {
+  grid-column: 1;
+  max-width: 100%;
+}
+
+.today-card .hero-label {
+  margin-bottom: 6px;
+}
+
+.today-card .hero-value {
+  font-size: clamp(20px, 3vw, 25px);
+  margin: 0;
+  text-transform: lowercase;
+}
+
+.today-card .hero-value::first-letter {
+  text-transform: uppercase;
+}
+
+.today-card #todayDate {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  max-width: 100%;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.today-card #todayDate > span:last-child {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-card.accent {
+  min-height: 0;
+}
+
+.lesson-title-button {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--ink);
+  text-align: left;
+  font-size: clamp(20px, 3vw, 25px);
+  font-weight: 700;
+  line-height: 1.24;
+  opacity: 1;
+  -webkit-text-fill-color: var(--ink);
+}
+
+.lesson-title-button.can-expand {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  padding-right: 25px;
+  cursor: pointer;
+}
+
+.lesson-title-button.can-expand::after {
+  content: "⌄";
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.lesson-title-button[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.lesson-full {
+  margin: 8px 0 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.lesson-kind {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#nextClassMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 12px;
+}
+
+.lesson-time,
+.class-room {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.lesson-time {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-label {
+  font-size: 11px;
+  letter-spacing: 0.07em;
+}
+
+.week-toggle,
+.subgroup-toggle {
+  border-radius: 20px;
+}
+
+.week-btn,
+.subgroup-btn,
+.teacher-btn,
+.day-chip {
+  border-radius: 16px;
+  min-height: 44px;
+  font-size: 12px;
+}
+
+.week-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 54px;
+}
+
+.current-week-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.view-btn {
+  min-height: 40px;
+  font-size: 12px;
+}
+
+.day-chip {
+  font-size: 11px;
+}
+
+.panel-hint {
+  font-size: 11px;
+}
+
+.day-context {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.today-button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 16px;
+  color: var(--ink);
+  background: var(--active-bg);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.search-results:empty {
+  margin-top: 0;
+}
+
+.teacher-subjects,
+.teacher-dept,
+.teacher-modal-label {
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+  }
+
+  .brand {
+    flex-direction: row;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .brand-title {
+    font-size: 26px;
+  }
+
+  .brand-sub {
+    font-size: 10px;
+  }
+
+  .today-card {
+    min-height: 94px;
+    padding-block: 16px;
+  }
+
+  .search-input {
+    font-size: 16px;
+    border-radius: 18px;
+  }
+
+  .week-btn,
+  .subgroup-btn {
+    padding: 8px 5px;
+  }
+
+  .class-title {
+    font-size: 14px;
+  }
+
+  .class-lines {
+    font-size: 12px;
+  }
+}

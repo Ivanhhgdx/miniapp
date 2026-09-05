@@ -13,6 +13,7 @@ const state = {
   data: null,
   session: null,
   view: "day",
+  mode: "schedule",
 };
 
 const weekButtons = document.querySelectorAll(".week-btn");
@@ -30,6 +31,11 @@ const todayLabel = document.getElementById("todayLabel");
 const todayDate = document.getElementById("todayDate");
 const nextClassTitle = document.getElementById("nextClassTitle");
 const nextClassMeta = document.getElementById("nextClassMeta");
+const nextClassFull = document.getElementById("nextClassFull");
+const nextClassKind = document.getElementById("nextClassKind");
+const goToday = document.getElementById("goToday");
+let heroEntryKey = "";
+let lastClockDate = new Date();
 const nextLabel = document.getElementById("nextLabel");
 const schedulePanels = document.querySelectorAll(".schedule-panel");
 const sessionPanel = document.getElementById("sessionPanel");
@@ -62,22 +68,18 @@ const examMaterials = {
   "Введение в высшую математику": {
     themes: ["Пределы и производные", "Интегралы", "Ряды и простые уравнения"],
     materials: ["Конспект лекций", "Сборник задач", "Чек-лист формул"],
-    tips: ["Прорешать типовые задачи", "Собрать шпаргалку формул"],
   },
   "История России": {
     themes: ["Основные эпохи", "Ключевые реформы", "Исторические личности"],
     materials: ["Конспект лекций", "Краткий план ответа", "Таймлайн событий"],
-    tips: ["Учить даты блоками", "Готовить ответы по билетам"],
   },
   "Механика": {
     themes: ["Кинематика", "Динамика", "Законы сохранения"],
     materials: ["Лекции", "Практикум", "Типовые задачи"],
-    tips: ["Решить 10 задач по каждой теме", "Повторить формулы"],
   },
   "Введение в технику физического эксперимента": {
     themes: ["Погрешности", "Методы измерений", "Обработка данных"],
     materials: ["Методичка", "Лабораторные отчеты", "Список терминов"],
-    tips: ["Повторить обозначения", "Подготовить шаблон отчета"],
   },
 };
 
@@ -162,19 +164,8 @@ const teachersData = [
   },
 ];
 
-const AUTO_WEEK_START = new Date(2026, 7, 31);
-const AUTO_WEEK_AT_START = 1;
-
-function getUtcDayNumber(date) {
-  // Compute by calendar date parts (stable across DST transitions).
-  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
-}
-
-function getAutoWeekNumber() {
-  const diffDays = getUtcDayNumber(new Date()) - getUtcDayNumber(AUTO_WEEK_START);
-  const weeksSince = Math.floor(diffDays / 7);
-  const parity = ((weeksSince % 2) + 2) % 2;
-  return parity === 0 ? AUTO_WEEK_AT_START : 3 - AUTO_WEEK_AT_START;
+function getAutoWeekNumber(now = new Date()) {
+  return ScheduleLogic.getWeekNumber(now);
 }
 
 function setWeek(week) {
@@ -189,6 +180,7 @@ function setWeek(week) {
 
 function toggleView(view) {
   const isSession = view === "session";
+  state.mode = view;
   schedulePanels.forEach((panel) => panel.classList.toggle("is-hidden", isSession));
   sessionPanel.classList.toggle("is-hidden", !isSession);
   subgroupToggle.classList.toggle("is-hidden", isSession);
@@ -200,6 +192,7 @@ function toggleView(view) {
   } else {
     setScheduleView(state.view);
   }
+  updateHeroDay();
 }
 
 function setDay(day) {
@@ -344,7 +337,7 @@ function createClassCard(entry, blocks) {
     linesWrap.className = "class-lines";
     block.displayLines.forEach((line) => {
       const span = document.createElement("span");
-      span.textContent = line;
+      appendDetailLine(span, line);
       linesWrap.appendChild(span);
     });
 
@@ -395,32 +388,6 @@ function getEntriesForDay(week, day) {
     .sort((a, b) => parseStartMinutes(a.time) - parseStartMinutes(b.time));
 }
 
-function pickDefaultDay(week) {
-  const now = new Date();
-  const dayIndex = now.getDay();
-  const todayName = dayOrder[dayIndex - 1];
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-  if (todayName) {
-    const todayEntries = getEntriesForDay(week, todayName);
-    if (todayEntries.length) {
-      const lastEnd = Math.max(...todayEntries.map((entry) => parseEndMinutes(entry.time)));
-      if (nowMinutes <= lastEnd) {
-        return todayName;
-      }
-    }
-  }
-
-  const startIndex = Math.max(dayIndex - 1, 0);
-  for (let i = startIndex; i < dayOrder.length; i += 1) {
-    const day = dayOrder[i];
-    const entries = getEntriesForDay(week, day);
-    if (entries.length) return day;
-  }
-
-  return dayOrder[0];
-}
-
 function renderDayChips() {
   dayChips.innerHTML = "";
   dayOrder.forEach((day) => {
@@ -437,21 +404,15 @@ function renderClasses() {
   if (!state.data) return;
   const entries = getEntriesForDay(state.week, state.day);
 
-  if (entries.length) {
-    const first = entries[0].time;
-    const last = entries[entries.length - 1].time;
-    daySummary.textContent = `${entries.length} пар(ы) • ${first}–${last.split("-")[1]}`;
-  } else {
-    daySummary.textContent = "Нет занятий";
-  }
-
+  daySummary.textContent = ScheduleLogic.formatDaySummary(entries);
   updateHeroDay();
+  renderNextClass(entries);
 
   classesWrap.innerHTML = "";
   if (!entries.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "Сегодня можно выдохнуть — пар нет.";
+    empty.textContent = "На выбранный день занятий нет.";
     classesWrap.appendChild(empty);
     return;
   }
@@ -463,15 +424,13 @@ function renderClasses() {
     classesWrap.appendChild(card);
   });
 
-  renderNextClass(entries);
   updateLiveProgress();
 }
 
 function updateHeroDay() {
   const today = new Date();
-  const dayIndex = today.getDay();
-  const todayName = dayOrder[dayIndex - 1];
-  const isToday = todayName === state.day;
+  const todayName = ScheduleLogic.getDayName(today);
+  const isToday = todayName === state.day && state.week === getAutoWeekNumber(today);
 
   todayLabel.textContent = todayName || "Сегодня";
   const formattedDate = today.toLocaleDateString("ru-RU", {
@@ -483,60 +442,97 @@ function updateHeroDay() {
     minute: "2-digit",
   });
   todayDate.innerHTML = `<span>${formattedDate}</span><span>${formattedTime}</span>`;
-  todayHint.textContent = isToday ? "Сегодня" : state.day;
+  todayHint.textContent = state.mode === "session" ? "Сессия" : isToday ? "Сегодня" : state.day.toLocaleLowerCase("ru-RU");
+  goToday.hidden = isToday && state.mode !== "session";
+  weekButtons.forEach((button) => {
+    const current = Number(button.dataset.week) === getAutoWeekNumber(today);
+    const label = button.querySelector(".current-week-label");
+    if (label) label.hidden = !current;
+    button.setAttribute("aria-label", button.dataset.week === "session" ? "Сессия" : `${button.dataset.week} неделя${current ? ", текущая" : ""}`);
+  });
+}
+
+function appendDetailLine(parent, line) {
+  const match = line.match(/ауд\.\s*[^,;\n]+/i);
+  if (!match) { parent.textContent = line; return; }
+  parent.append(document.createTextNode(line.slice(0, match.index)));
+  const room = document.createElement("strong");
+  room.className = "class-room";
+  room.textContent = match[0];
+  parent.append(room, document.createTextNode(line.slice(match.index + match[0].length)));
 }
 
 function renderNextClass(entries) {
-  if (!entries.length) {
-    nextLabel.textContent = "Следующая пара";
-    nextClassTitle.textContent = "Пар нет";
-    nextClassMeta.textContent = "Можно отдыхать.";
+  const status = ScheduleLogic.getLessonState(entries, state.week, state.day);
+  const entry = status.entry;
+  const primary = entry ? pickPrimaryBlock(entry) : null;
+  const key = `${state.week}:${state.day}:${entry?._id ?? status.kind}:${state.subgroup}`;
+  if (key !== heroEntryKey) {
+    nextClassFull.hidden = true;
+    nextClassTitle.setAttribute("aria-expanded", "false");
+    heroEntryKey = key;
+  }
+  nextClassMeta.replaceChildren();
+  if (!entry) {
+    nextLabel.textContent = status.kind === "finished" ? "На сегодня" : "Выбранный день";
+    nextClassTitle.textContent = status.kind === "finished" ? "Занятия завершены" : "Занятий нет";
+    nextClassTitle.disabled = true;
+    nextClassTitle.removeAttribute("aria-expanded");
+    nextClassTitle.classList.remove("can-expand");
+    nextClassKind.hidden = true;
+    nextClassFull.hidden = true;
+    nextClassFull.textContent = "";
     return;
   }
+  const title = ScheduleLogic.formatLessonTitle(primary?.title || "Занятие");
+  nextLabel.textContent = status.kind === "live" ? `Сейчас идёт · осталось ${status.remaining} мин` : status.kind === "upcoming" ? `Начнётся через ${status.remaining} мин` : "Первая пара выбранного дня";
+  nextClassTitle.textContent = title.short;
+  nextClassTitle.disabled = !title.expandable;
+  if (!title.expandable) nextClassTitle.removeAttribute("aria-expanded");
+  nextClassTitle.classList.toggle("can-expand", title.expandable);
+  nextClassFull.textContent = title.full;
+  nextClassKind.textContent = title.kind;
+  nextClassKind.hidden = !title.kind;
+  const time = document.createElement("span");
+  time.className = "lesson-time";
+  time.textContent = entry.time.replace("-", "–");
+  nextClassMeta.appendChild(time);
+  (primary?.displayLines || []).forEach((line) => {
+    const detail = document.createElement("span");
+    appendDetailLine(detail, line);
+    nextClassMeta.appendChild(detail);
+  });
+}
 
+function returnToToday() {
   const now = new Date();
-  const todayDay = dayOrder[now.getDay() - 1];
-  const isToday = todayDay === state.day;
+  state.day = ScheduleLogic.getDayName(now);
+  state.view = "day";
+  setWeek(getAutoWeekNumber(now));
+  setDay(state.day);
+}
 
-  const entriesWithMinutes = entries.map((entry) => ({
-    ...entry,
-    start: parseStartMinutes(entry.time),
-  }));
-
-  if (isToday) {
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-    const upcoming = entriesWithMinutes.find((entry) => entry.start > nowMinutes);
-    if (upcoming) {
-      const primary = pickPrimaryBlock(upcoming);
-      const detailLine = primary?.displayLines[0] || "Без аудитории";
-      nextLabel.textContent = "Следующая пара";
-      nextClassTitle.textContent = primary?.title || "Без названия";
-      nextClassMeta.textContent = `${upcoming.time} • ${detailLine}`;
-      return;
-    }
-
-    nextLabel.textContent = "Пары на сегодня";
-    nextClassTitle.textContent = "Все закончились";
-    nextClassMeta.textContent = "Можно выдохнуть.";
-    return;
+function refreshClock() {
+  const now = new Date();
+  const wasToday = state.day === ScheduleLogic.getDayName(lastClockDate) && state.week === getAutoWeekNumber(lastClockDate);
+  if (wasToday && state.mode !== "session" && now.toDateString() !== lastClockDate.toDateString()) {
+    returnToToday();
   }
-
-  const first = entriesWithMinutes[0];
-  const primary = pickPrimaryBlock(first);
-  const detailLine = primary?.displayLines[0] || "Без аудитории";
-  nextLabel.textContent = "Первая пара";
-  nextClassTitle.textContent = primary?.title || "Без названия";
-  nextClassMeta.textContent = `${first.time} • ${detailLine}`;
+  if (now.toDateString() !== lastClockDate.toDateString()) renderSession();
+  lastClockDate = now;
+  updateHeroDay();
+  if (state.data) renderNextClass(getEntriesForDay(state.week, state.day));
+  updateLiveProgress();
 }
 
 function renderSession() {
   if (!state.session) return;
-  const items = state.session.session_upcoming || [];
+  const items = ScheduleLogic.getUpcomingExams(state.session.session_upcoming || []);
   sessionWrap.innerHTML = "";
   if (!items.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "Все экзамены уже прошли.";
+    empty.textContent = "Предстоящие экзамены не указаны.";
     sessionWrap.appendChild(empty);
     return;
   }
@@ -567,6 +563,7 @@ function normalizeSearch(text) {
 function renderSearchResults(query) {
   if (!state.data) return;
   const trimmed = query.trim();
+  searchClear.hidden = query.length === 0;
   if (!trimmed) {
     searchResults.innerHTML = "";
     return;
@@ -653,7 +650,7 @@ function renderWeek() {
   if (!weekEntries.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "Нет пар на этой неделе.";
+    empty.textContent = "На выбранной неделе занятий нет.";
     weekClasses.appendChild(empty);
     return;
   }
@@ -691,14 +688,14 @@ function updateLiveProgress() {
     const end = Number(card.dataset.progressEnd);
     const cardDay = card.dataset.progressDay;
     const cardWeek = Number(card.dataset.progressWeek);
-    const isToday = cardDay === todayName && cardWeek === state.week;
+    const isToday = cardDay === todayName && cardWeek === getAutoWeekNumber(now);
     const percent = isToday ? getProgressPercent(start, end, nowMinutes) : 0;
     const fill = card.querySelector(".class-progress-fill");
     if (fill) {
       fill.style.width = `${percent}%`;
     }
-    card.classList.toggle("is-live", isToday && nowMinutes >= start && nowMinutes <= end);
-    card.classList.toggle("is-past", isToday && nowMinutes > end);
+    card.classList.toggle("is-live", isToday && nowMinutes >= start && nowMinutes < end);
+    card.classList.toggle("is-past", isToday && nowMinutes >= end);
   });
 }
 
@@ -728,14 +725,12 @@ function openExamModal(item) {
   const defaults = {
     themes: ["Повторить ключевые темы", "Список вопросов из билетов"],
     materials: ["Конспект лекций", "Методичка", "Практика с задачами"],
-    tips: ["Сделать план ответа", "Разделить подготовку на блоки"],
   };
   const material = examMaterials[item.subject] || defaults;
 
   const sections = [
     { title: "Темы", items: material.themes },
     { title: "Материалы", items: material.materials },
-    { title: "Советы", items: material.tips },
   ];
 
   sections.forEach((section) => {
@@ -777,10 +772,10 @@ function renderTeachers() {
     subjects.textContent = teacher.subjects.join(", ");
     const dept = document.createElement("div");
     dept.className = "teacher-dept";
-    dept.textContent = teacher.department || "Кафедра не указана";
+    dept.textContent = teacher.department;
     card.appendChild(name);
     card.appendChild(subjects);
-    card.appendChild(dept);
+    if (ScheduleLogic.hasKnownValue(teacher.department)) card.appendChild(dept);
     card.addEventListener("click", () => {
       openTeacherModal(teacher);
     });
@@ -792,6 +787,7 @@ function openTeachersOverlay() {
   if (!teachersOverlay) return;
   renderTeachers();
   teachersOverlay.classList.remove("is-hidden");
+  teachersOverlay.setAttribute("aria-hidden", "false");
   requestAnimationFrame(() => {
     teachersOverlay.classList.add("is-visible");
   });
@@ -801,6 +797,7 @@ function openTeachersOverlay() {
 function closeTeachersOverlay() {
   if (!teachersOverlay) return;
   teachersOverlay.classList.remove("is-visible");
+  teachersOverlay.setAttribute("aria-hidden", "true");
   const onEnd = () => {
     teachersOverlay.classList.add("is-hidden");
     teachersOverlay.removeEventListener("transitionend", onEnd);
@@ -852,7 +849,7 @@ function openTeacherModal(teacher) {
   positionBlock.appendChild(positionValue);
 
   teacherModalBody.appendChild(subjectsBlock);
-  teacherModalBody.appendChild(departmentBlock);
+  if (ScheduleLogic.hasKnownValue(teacher.department)) teacherModalBody.appendChild(departmentBlock);
   teacherModalBody.appendChild(positionBlock);
   teacherModal.classList.remove("is-hidden");
   teacherModal.classList.add("is-visible");
@@ -927,7 +924,7 @@ function enableMobileSwipeBack() {
 
 function setTodayDefaults() {
   todayHint.textContent = "";
-  state.day = pickDefaultDay(state.week);
+  state.day = ScheduleLogic.getDayName(new Date());
 }
 
 async function init() {
@@ -1014,11 +1011,11 @@ async function init() {
     btn.classList.toggle("active", btn.dataset.subgroup === storedSubgroup)
   );
 
+  const storedView = localStorage.getItem(VIEW_KEY);
   setWeek(getAutoWeekNumber());
   setTodayDefaults();
   setDay(state.day);
 
-  const storedView = localStorage.getItem(VIEW_KEY);
   if (storedView === "session") {
     weekButtons.forEach((btn) => {
       if (btn.dataset.week === "session") btn.classList.add("active");
@@ -1029,8 +1026,15 @@ async function init() {
   renderSession();
   renderWeek();
   updateHeroDay();
-  setInterval(updateHeroDay, 60 * 1000);
-  setInterval(updateLiveProgress, 30 * 1000);
+  goToday.addEventListener("click", returnToToday);
+  nextClassTitle.addEventListener("click", () => {
+    const expanded = nextClassTitle.getAttribute("aria-expanded") === "true";
+    nextClassTitle.setAttribute("aria-expanded", String(!expanded));
+    nextClassFull.hidden = expanded;
+  });
+  setInterval(refreshClock, 30 * 1000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshClock(); });
+  window.addEventListener("pageshow", refreshClock);
 
   if (searchInput) {
     searchInput.addEventListener("input", () => renderSearchResults(searchInput.value));
@@ -1044,7 +1048,7 @@ async function init() {
   if (searchClear) {
     searchClear.addEventListener("click", () => {
       searchInput.value = "";
-      searchResults.innerHTML = "";
+      renderSearchResults("");
       searchInput.focus();
     });
   }

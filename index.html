@@ -18,7 +18,7 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Prata&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=18" />
+    <link rel="stylesheet" href="styles.css?v=19" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
@@ -52,20 +52,22 @@
             placeholder="Поиск"
             autocomplete="off"
           />
-          <button class="search-clear" id="searchClear" type="button" aria-label="Очистить">×</button>
+          <button class="search-clear" id="searchClear" type="button" aria-label="Очистить" hidden>×</button>
         </div>
         <div class="search-results" id="searchResults"></div>
       </section>
 
       <section class="hero">
-        <div class="hero-card">
+        <div class="hero-card today-card">
           <div class="hero-label">Сегодня</div>
           <div class="hero-value" id="todayLabel">—</div>
           <div class="hero-sub" id="todayDate">—</div>
         </div>
         <div class="hero-card accent">
           <div class="hero-label" id="nextLabel">Следующая пара</div>
-          <div class="hero-value" id="nextClassTitle">—</div>
+          <button class="hero-value lesson-title-button" id="nextClassTitle" type="button" aria-expanded="false" aria-controls="nextClassFull" disabled>—</button>
+          <div class="lesson-full" id="nextClassFull" hidden></div>
+          <div class="lesson-kind" id="nextClassKind" hidden></div>
           <div class="hero-sub" id="nextClassMeta">—</div>
         </div>
       </section>
@@ -73,11 +75,14 @@
       <section class="panel controls-panel">
         <div class="panel-head">
           <h2>Параметры</h2>
-          <div class="panel-hint" id="todayHint"></div>
+          <div class="day-context">
+            <div class="panel-hint" id="todayHint"></div>
+            <button class="today-button" id="goToday" type="button" hidden>Сегодня</button>
+          </div>
         </div>
         <div class="week-toggle" role="tablist">
-          <button class="week-btn" data-week="1">1 неделя</button>
-          <button class="week-btn" data-week="2">2 неделя</button>
+          <button class="week-btn" data-week="1"><span>1 неделя</span><span class="current-week-label" hidden>Текущая</span></button>
+          <button class="week-btn" data-week="2"><span>2 неделя</span><span class="current-week-label" hidden>Текущая</span></button>
           <button class="week-btn" data-week="session">Сессия</button>
         </div>
         <div class="subgroup-toggle" id="subgroupToggle" role="tablist">
@@ -154,6 +159,7 @@
     </div>
 
     <script src="data/data.js?v=5"></script>
-    <script src="app.js?v=11"></script>
+    <script src="schedule-logic.js?v=1"></script>
+    <script src="app.js?v=12"></script>
   </body>
 </html>
