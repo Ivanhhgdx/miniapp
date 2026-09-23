@@ -1,3 +1,23 @@
+const teacherFullNames = {
+  "Шелихова С. В.": "Шелихова Светлана Викторовна",
+  "Подпорина Н. М.": "Подпорина Наталья Михайловна",
+  "Федченко Д. П.": "Федченко Дмитрий Петрович",
+  "Лозовой А. А.": "Лозовой Александр Александрович",
+  "Кубрикова А. С.": "Кубрикова Анна Сергеевна",
+  "Осипов В. В.": "Осипов Владимир Владимирович",
+  "Логунова О. В.": "Логунова Ольга Викторовна",
+  "Золотова О. П.": "Золотова Ольга Павловна",
+  "Летунова О. В.": "Летунова Ольга Владимировна",
+  "Карпов Е. С.": "Карпов Евгений Сергеевич",
+  "Селиванова А. С.": "Селиванова Анастасия Сергеевна",
+  "Кузнецов А. А.": "Кузнецов Александр Алексеевич"
+};
+
+function expandTeacherNames(text) {
+  return Object.entries(teacherFullNames).reduce((value, [shortName, name]) =>
+    value.split(shortName).join(name), text);
+}
+
 const dayOrder = [
   "ПОНЕДЕЛЬНИК",
   "ВТОРНИК",
@@ -146,7 +166,7 @@ function getProgressPercent(startMinutes, endMinutes, nowMinutes) {
 function normalizeLines(text) {
   return text
     .split("\n")
-    .map((line) => line.trim())
+    .map((line) => expandTeacherNames(line.trim()))
     .filter(Boolean);
 }
 
