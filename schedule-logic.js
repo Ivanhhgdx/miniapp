@@ -11,6 +11,17 @@ const ScheduleLogic = (() => {
     const [h, m] = time.trim().split(":").map(Number);
     return h * 60 + m;
   }
+  function getDefaultSelection(entries, now = new Date()) {
+    const date = new Date(now);
+    const week = getWeekNumber(date);
+    const day = getDayName(date);
+    const todayEntries = entries.filter((entry) => entry.week === week && entry.day === day);
+    const ends = todayEntries.map((entry) => minutes(entry.time.split("-")[1])).filter(Number.isFinite);
+    if (ends.length && now.getHours() * 60 + now.getMinutes() >= Math.max(...ends)) {
+      date.setDate(date.getDate() + 1);
+    }
+    return { week: getWeekNumber(date), day: getDayName(date) };
+  }
   function getLessonState(entries, week, day, now = new Date()) {
     const sorted = [...entries].sort((a, b) => minutes(a.time.split("-")[0]) - minutes(b.time.split("-")[0]));
     if (!sorted.length) return { kind: "empty" };
@@ -56,6 +67,6 @@ const ScheduleLogic = (() => {
   function hasKnownValue(value) {
     return Boolean(value?.trim()) && !/^не указан[аоы]?\.?$/i.test(value.trim());
   }
-  return { getDayName, getWeekNumber, getLessonState, formatLessonTitle, formatDaySummary, hasKnownValue, getUpcomingExams };
+  return { getDefaultSelection, getDayName, getWeekNumber, getLessonState, formatLessonTitle, formatDaySummary, hasKnownValue, getUpcomingExams };
 })();
 if (typeof module !== "undefined") module.exports = ScheduleLogic;

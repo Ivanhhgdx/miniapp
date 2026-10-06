@@ -704,7 +704,10 @@ function closeExamModal() {
 
 function setTodayDefaults() {
   todayHint.textContent = "";
-  state.day = pickDefaultDay(state.week);
+  const entries = (state.data?.schedule || []).filter((entry) => entryMatchesSubgroup(entry, state.subgroup));
+  const selection = ScheduleLogic.getDefaultSelection(entries);
+  state.day = selection.day;
+  setWeek(selection.week);
 }
 
 async function init() {

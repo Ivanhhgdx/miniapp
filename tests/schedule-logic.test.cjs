@@ -60,3 +60,20 @@ test('upcoming exams exclude historical records and include today', () => {
   const exams=[{date:'19.01.2026'},{date:'06.09.2026'},{date:'05.09.2026'},{date:'31.02.2026'}];
   assert.deepEqual(getUpcomingExams(exams,now(15,10)).map(item=>item.date),['05.09.2026','06.09.2026']);
 });
+
+const {getDefaultSelection} = require('../schedule-logic.js');
+const saturday = [{week:1,day:'СУББОТА',time:'15:10-16:40'}, {week:1,day:'СУББОТА',time:'13:30-15:00'}];
+test('default opens today until the last lesson ends, then tomorrow', () => {
+  for (const [h,m] of [[8,0],[15,0],[16,39]]) {
+    assert.deepEqual(getDefaultSelection(saturday,now(h,m)),{week:1,day:'СУББОТА'});
+  }
+  for (const [h,m] of [[16,40],[23,59]]) {
+    assert.deepEqual(getDefaultSelection(saturday,now(h,m)),{week:1,day:'ВОСКРЕСЕНЬЕ'});
+  }
+});
+test('empty days remain today, and next day uses its own week', () => {
+  assert.deepEqual(getDefaultSelection(saturday,new Date(2026,8,6,20)),{week:1,day:'ВОСКРЕСЕНЬЕ'});
+  const sunday = [{week:1,day:'ВОСКРЕСЕНЬЕ',time:'09:40-11:10'}];
+  assert.deepEqual(getDefaultSelection(sunday,new Date(2026,8,6,11,10)),{week:2,day:'ПОНЕДЕЛЬНИК'});
+  assert.deepEqual(getDefaultSelection(saturday,new Date(2026,8,7,0)),{week:2,day:'ПОНЕДЕЛЬНИК'});
+});
